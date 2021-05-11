@@ -14,6 +14,8 @@ def PreprocessBWT(bwt):
         occ_counts_before[C][P] is the number of occurrences of character C in bwt
         from position 0 to position P inclusive.
   """
+
+  # iterate through each char in string and map char to its index (list of indices where each char appears in the string)
   occurence_dict = dict()
 
   for i in range(len(bwt)):
@@ -37,19 +39,24 @@ def PreprocessBWT(bwt):
 
     for occurence in occurences:
 
+      # append the running counter (j) of occurences for that char it to the list until we reach the next occurence index
+      # this works as the lists of indices in occurence_dict is in sorted order since we iterated from start to end of the string
       while i < occurence:
 
         occ_counts_before[char].append(j)
 
         i += 1
 
+      # increment the running counter of occurences 
       j += 1
     
+    # append j for the remaining indices up till the end of the string
     while i <= len(bwt):
 
       occ_counts_before[char].append(j)
       i += 1
 
+  # get the set of chars in the string sorted lexigraphically
   chars = sorted(list(occ_counts_before.keys()))
 
   starts = {char : 0 for char in chars}
@@ -57,6 +64,9 @@ def PreprocessBWT(bwt):
   i = 0
   for j in range(1, len(chars)):
 
+    # the index of the first occurence of a char would be the number of occurences of the previous char added to the index of the first occurence of the previous char (which is represented by the pointer i)
+    # e.g. string = 'AAABBBBCC'
+    # starts[A] = 0, num_occurences[A] = 3. Thus, starts[B] = 3 + 0 = 3
     next_char = chars[j]
     char = chars[j-1]
 
@@ -81,13 +91,18 @@ def CountOccurrences(pattern, bwt, starts, occ_counts_before):
   while top <= bottom:
     
     if j <= len(pattern):
+      # the pattern has not been fully searched
       
       char = pattern[-j]
 
       if char not in starts:
-        return 0
+        # the char is not a char in the string 
+        return 0  
 
+      
+      # get the number of occurences of the char in the last column of our BWT matrix (i.e the input string) between the index/row range of top and bottom (inclusive)
       if top == 0:
+
         num_counts = occ_counts_before[char][bottom]
 
       else:
@@ -96,15 +111,19 @@ def CountOccurrences(pattern, bwt, starts, occ_counts_before):
 
       if num_counts > 0:
 
+        # the char occurs in the specified range
+        # update top and bottom to the corresponding rows in the first col of the BWT matrix (i.e. sorted string)
         top = starts[char] + occ_counts_before[char][bottom] - num_counts
         bottom = starts[char] + occ_counts_before[char][bottom] - 1
        
       else:
 
+        # char does not occur between top and bottom rows -> pattern not found
         return 0
     
     else:
-
+      
+      # pattern has been fully searched -> get the number of occurences of pattern
       return bottom - top + 1
 
     j += 1
