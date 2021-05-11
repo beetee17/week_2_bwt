@@ -2,10 +2,9 @@
 import sys
 
 
-
 def PreprocessBWT(bwt):
 
-    """
+  """
   Preprocess the Burrows-Wheeler Transform bwt of some text
   and compute as a result:
     * starts - for each character C in bwt, starts[C] is the first position 
@@ -15,7 +14,6 @@ def PreprocessBWT(bwt):
         occ_counts_before[C][P] is the number of occurrences of character C in bwt
         from position 0 to position P inclusive.
   """
-
   occurence_dict = dict()
 
   for i in range(len(bwt)):
